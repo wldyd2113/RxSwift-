@@ -8,24 +8,35 @@
 import UIKit
 import RxSwift
 class ObserableViewController: UIViewController {
-//    private var timerDisposable: Disposable?
-    private var disposeBag: DisposeBag = .init()
+    var observerButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Obserable Button", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .yellow
-
-        Observable<Int>.interval(
-          .seconds(1),
-          scheduler: MainScheduler.instance
-        )
-        .subscribe(onNext: {
-            print($0)
-        })
-        .disposed(by: disposeBag)
+        view.addSubview(observerButton)
+        NSLayoutConstraint.activate([
+            observerButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            observerButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+        ])
+        bindBtn()
     }
-       
+    
+    func bindBtn() {
+        observerButton.rx.tap
+            .subscribe(onNext: {
+                print("버튼 눌림")
+            },onDisposed: {
+                print("버튼 disposed")
+            }
+            )
+    }
+    
+    
 }
-
-
-
-
