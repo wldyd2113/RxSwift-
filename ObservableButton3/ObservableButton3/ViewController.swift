@@ -16,35 +16,47 @@ class ViewController: UIViewController {
         button.setTitle("Obserable Button", for: .normal)
         button.setTitleColor(.systemBlue, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(TapEvent), for: .touchUpInside)
+        return button
+    }()
+    var disposeButton:UIButton = {
+        let button = UIButton()
+        button.setTitle("Dipose Button", for: .normal)
+        button.setTitleColor(.systemRed, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     let disposeBag = DisposeBag()
-    
+    var buttonSubscription: Disposable? //구독을 저장할 변수
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         view.addSubview(observerButton)
+        view.addSubview(disposeButton)
         NSLayoutConstraint.activate([
             observerButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            observerButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            observerButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            disposeButton.centerXAnchor.constraint(equalTo: view.centerXAnchor ),
+            disposeButton.topAnchor.constraint(equalTo: observerButton.bottomAnchor, constant: 16)
+            
         ])
+        setupSubscriptions()
     }
-    
-    @objc func TapEvent() {
-        observerButton.rx
+    func setupSubscriptions() {
+        buttonSubscription = observerButton.rx
             .tap
             .subscribe(onNext: {
-                print("Observable이 항목을 방출 했다!")
-            },
-            onError: { error in
-                print("에러가 발생 했다!")
-            },
-            onCompleted: {
-                print("해당 이벤트가 끝났다!")
+                print("Observable 버튼이 눌림")
+            })
+        
+        disposeButton.rx
+            .tap
+            .subscribe(onNext: {
+                self.buttonSubscription?.dispose()
+                print("Observable 버튼 구독 해제")
+
             })
             .disposed(by: disposeBag)
-
     }
 
 }
