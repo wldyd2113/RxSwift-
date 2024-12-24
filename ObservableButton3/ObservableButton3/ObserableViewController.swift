@@ -8,23 +8,22 @@
 import UIKit
 import RxSwift
 class ObserableViewController: UIViewController {
-    private var timerDisposable: Disposable?
+//    private var timerDisposable: Disposable?
+    private var disposeBag: DisposeBag = .init()
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .yellow
 
-        timerDisposable = Observable<Int>.interval(
+        Observable<Int>.interval(
           .seconds(1),
           scheduler: MainScheduler.instance
         )
         .subscribe(onNext: {
             print($0)
         })
+        .disposed(by: disposeBag)
     }
-    deinit {
-        timerDisposable?.dispose()
-        print("ObserableViewController deinit - Timer 구독 해제")
-    }
+       
 }
 
 
