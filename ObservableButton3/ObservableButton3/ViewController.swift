@@ -32,6 +32,7 @@ class ViewController: UIViewController {
         self.view.backgroundColor = .white
         view.addSubview(observerButton)
         view.addSubview(disposeButton)
+        
         NSLayoutConstraint.activate([
             observerButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             observerButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -40,24 +41,20 @@ class ViewController: UIViewController {
             disposeButton.topAnchor.constraint(equalTo: observerButton.bottomAnchor, constant: 16)
             
         ])
-        setupSubscriptions()
+        bindButton()
     }
-    func setupSubscriptions() {
-        buttonSubscription = observerButton.rx
-            .tap
-            .subscribe(onNext: {
-                print("Observable 버튼이 눌림")
-            })
-        
-        disposeButton.rx
-            .tap
-            .subscribe(onNext: {
-                self.buttonSubscription?.dispose()
-                print("Observable 버튼 구독 해제")
-
+    func bindButton() {
+        // observerButton의 탭 이벤트를 구독
+        observerButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.presentObserableViewController()
             })
             .disposed(by: disposeBag)
     }
-
+    func presentObserableViewController() {
+        let observaleVC = ObserableViewController()
+//        observaleVC.modalPresentationStyle = .automatic
+        self.present(observaleVC, animated: true, completion: nil)
+    }
 }
 
